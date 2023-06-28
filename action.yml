@@ -1,0 +1,20 @@
+name: 'Blazor Merge Action'
+description: 'Combines the appsettings.json and appsettings.environment.json files into a single appsettings.json file'
+inputs:
+  app-environment:
+    description: 'The environment to use for the appsettings file'
+    required: true
+  path:
+    description: 'The path to the appsettings files'
+    required: true
+runs:
+  using: 'docker'
+  image: 'src/BlazorMerge/Dockerfile'
+  args:
+    - '-e'
+    - ${{ inputs.app-environment }}
+    - '-p'
+    - '/github/workspace${{ inputs.path }}'
+branding: 
+    icon: 'git-merge'
+    color: 'green'

@@ -5,20 +5,18 @@ namespace BlazorMerge.Feature.Merge;
 
 public class MergeService
 {
-    private readonly IConfiguration _config;
     private readonly IFileManager _fileManager;
     private readonly IMerger _merger;
 
     public MergeService(IConfiguration config, IFileManager fileManager, IMerger merger)
     {
-        _config = config;
         _fileManager = fileManager;
         _merger = merger;
     }
 
     public int MergeEnvironment(MergeOptions options)
     {
-        var mainFileName = _config["AppSettings:MainFileName"] ?? throw new InvalidOperationException(message:"MainFileName is not set in appsettings.json");
+        var mainFileName = Constants.MainFileName;
         var mainFilePath = ConstructPath(options.Path, mainFileName);
         var readAppSetting = _fileManager.ReadFile(mainFilePath);
         var environmentFileName = ReplacePath(options);
@@ -51,7 +49,7 @@ public class MergeService
 
     private bool OnlySettingsFiles(string fileName, MergeOptions options)
     {
-        var mainFileName = _config["AppSettings:MainFileName"] ?? throw new InvalidOperationException(message:"MainFileName is not set in appsettings.json");
+        var mainFileName = Constants.MainFileName;
         var environmentFileName = ReplacePath(options);
         return fileName.EndsWith(mainFileName) ||
                fileName.EndsWith($"{mainFileName}.br") ||
@@ -106,7 +104,7 @@ public class MergeService
     private string ReplacePath(MergeOptions options)
     {
         var environment = options.Environment;
-        var environmentFileNameFormat = _config["AppSettings:EnvironmentFileName"] ?? throw new InvalidOperationException("EnvironmentFileName is not set in appsettings.json");
+        var environmentFileNameFormat = Constants.EnvironmentFileName;
         
         return environmentFileNameFormat.Replace("{environment}", environment);
     }
