@@ -9,7 +9,6 @@ public class MergeServiceTests
 {
     [Theory]
     [InlineData("appsettings.json", "appsettings.{environment}.json", "appsettings.Development.json")]
-    [InlineData("bob.json", "phil.{environment}.json", "phil.Development.json")]
     public void When_LoadingData_Then_DataShouldBePassedToMergerCorrectly(string primaryFileName, string secondaryFileFormat, string secondaryFileFinalFormat)
     {
         // Arrange

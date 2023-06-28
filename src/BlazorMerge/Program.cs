@@ -27,9 +27,5 @@ IHostBuilder CreateHostBuilder(string[] strings)
             s.AddSingleton<MergeService>();
             s.AddSingleton<IFileManager, FileManager>();
             s.AddSingleton<IMerger, Merger>();
-        })
-        .ConfigureAppConfiguration(app =>
-        {
-            app.AddJsonFile("appsettings.json");
         });
 }

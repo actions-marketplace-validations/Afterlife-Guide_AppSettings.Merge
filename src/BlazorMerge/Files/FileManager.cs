@@ -1,15 +1,22 @@
-﻿namespace BlazorMerge.Files;
+﻿using Microsoft.Extensions.Logging;
+
+namespace BlazorMerge.Files;
 
 public class FileManager : IFileManager
 {
+    private readonly ILogger<FileManager> _logger;
+
+    public FileManager(ILogger<FileManager> logger)
+    {
+        _logger = logger;
+    }
+
     public string ReadFile(string path)
     {
-        if (FileDoesNotExist(path))
-        {
-            throw new FileNotFoundException($"File {path} does not exist");
-        }
-        
-        return File.ReadAllText(path);
+        if (!FileDoesNotExist(path)) return File.ReadAllText(path);
+        _logger.LogInformation("File {Path} does not exist", path);
+        throw new FileNotFoundException($"File {path} does not exist");
+
     }
 
     private static bool FileDoesNotExist(string path)
@@ -19,11 +26,13 @@ public class FileManager : IFileManager
 
     public void WriteFile(string path, string content)
     {
+        _logger.LogInformation("Writing file {Path}", path);
         File.WriteAllText(path, content);
     }
 
     public void DeleteFile(string path)
     {
+        _logger.LogInformation("Deleting file {Path}", path);
         File.Delete(path);
     }
 
