@@ -2,6 +2,8 @@
 using BlazorMerge.Files;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 
 namespace BlazorMerge.UnitTests.Merge;
 
@@ -30,23 +32,23 @@ public class MergeServiceTests
             $"{secondaryFileFinalFormat}.br",
             $"{secondaryFileFinalFormat}.gz"
         };
-        var mockConfig = new Mock<IConfiguration>();
-        mockConfig.Setup(m => m["AppSettings:MainFileName"]).Returns(primaryFileName);
-        mockConfig.Setup(m => m["AppSettings:EnvironmentFileName"]).Returns(secondaryFileFormat);
+        var mockConfig = Substitute.For<IConfiguration>();
+        mockConfig["AppSettings:MainFileName"].Returns(primaryFileName);
+        mockConfig["AppSettings:EnvironmentFileName"].Returns(secondaryFileFormat);
+
+        var mockFileManager = Substitute.For<IFileManager>();
+        mockFileManager.ReadFile(Arg.Any<string>()).Returns(readValue);
+        mockFileManager.WriteFile(Arg.Any<string>(), Arg.Any<string>()); // can I delete this line?
+        mockFileManager.ListSettingsFiles(Arg.Any<string>(), Arg.Any<Func<string, bool>>()).Returns(settingsFiles);
+        mockFileManager.DeleteFile(Arg.Any<string>()); // can I delete this line?
         
-        var mockFileManager = new Mock<IFileManager>();
-        mockFileManager.Setup(m => m.ReadFile(It.IsAny<string>())).Returns(readValue);
-        mockFileManager.Setup(m => m.WriteFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
-        mockFileManager.Setup(m => m.ListSettingsFiles(It.IsAny<string>(), It.IsAny<Func<string, bool>>())).Returns(settingsFiles);
-        mockFileManager.Setup(m => m.DeleteFile(It.IsAny<string>())).Verifiable();
-        
-        var mockMerger = new Mock<IMerger>();
-        mockMerger.Setup(m => m.Merge(It.IsAny<string>(), It.IsAny<string>())).Returns(mergeValue);
+        var mockMerger = Substitute.For<IMerger>();
+        mockMerger.Merge(Arg.Any<string>(), Arg.Any<string>()).Returns(mergeValue);
         
         var mergeService = new MergeService(
-            mockConfig.Object,
-            mockFileManager.Object,
-            mockMerger.Object
+            mockConfig,
+            mockFileManager,
+            mockMerger
             );
         
         // Act
@@ -54,31 +56,31 @@ public class MergeServiceTests
         
         // Assert
         result.Should().Be(0);
-        mockFileManager.Verify(m => m.ReadFile(It.IsAny<string>()), Times.Exactly(2));
-        mockFileManager.Verify(m => m.ReadFile($"{options.Path}{primaryFileName}"), Times.Once);
-        mockFileManager.Verify(m => m.ReadFile($"{options.Path}{secondaryFileFinalFormat}"), Times.Once);
-        mockFileManager.Verify(m => m.WriteFile($"{options.Path}{primaryFileName}", mergeValue), Times.Once);
+        mockFileManager.Received(2).ReadFile(Arg.Any<string>());
+        mockFileManager.Received(1).ReadFile($"{options.Path}{primaryFileName}");
+        mockFileManager.Received(1).ReadFile($"{options.Path}{secondaryFileFinalFormat}");
+        mockFileManager.Received(1).WriteFile($"{options.Path}{primaryFileName}", mergeValue);
         
         var environmentJsonFiles = settingsFiles.Where(s => s == secondaryFileFinalFormat).ToList();
         var allBrotliFiles = settingsFiles.Where(s => s.EndsWith(".br")).ToList();
         var allGzipFiles = settingsFiles.Where(s => s.EndsWith(".gz")).ToList();
         var filesToDeleteCount = environmentJsonFiles.Count + allBrotliFiles.Count + allGzipFiles.Count;
 
-        mockFileManager.Verify(m => m.ListSettingsFiles(options.Path, It.IsAny<Func<string, bool>>()), Times.Once);
-        mockFileManager.Verify(m => m.DeleteFile(It.IsAny<string>()), Times.Exactly(filesToDeleteCount));
+        mockFileManager.Received(1).ListSettingsFiles(options.Path, Arg.Any<Func<string, bool>>());
+        mockFileManager.Received(filesToDeleteCount).DeleteFile(Arg.Any<string>());
         VerifyDeletion(mockFileManager, options, environmentJsonFiles);
         VerifyDeletion(mockFileManager, options, allBrotliFiles);
         VerifyDeletion(mockFileManager, options, allGzipFiles);
         
-        mockMerger.Verify(m => m.Merge(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        mockMerger.Received(1).Merge(Arg.Any<string>(), Arg.Any<string>());
     }
 
-    private static void VerifyDeletion(Mock<IFileManager> mockFileManager, MergeOptions options, IEnumerable<string> files)
+    private static void VerifyDeletion(IFileManager mockFileManager, MergeOptions options, IEnumerable<string> files)
     {
         foreach (var file in files)
         {
             var path = $"{options.Path}{file}";
-            mockFileManager.Verify(m => m.DeleteFile(path), Times.Once);
+            mockFileManager.Received(1).DeleteFile(path);
         }
     }
 }
