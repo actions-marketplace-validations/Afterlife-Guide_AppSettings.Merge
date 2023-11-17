@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EEC2813C-EAE5-4149-A84C-2D94341AF113}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E2806C90-5768-465A-82DF-2FF4741C48FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AA4BD815-7D15-4D06-BBEF-70A918615A3B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitmessage = .gitmessage
+		.gitignore = .gitignore
+		src\BlazorMerge\Dockerfile = src\BlazorMerge\Dockerfile
+		action.yml = action.yml
+		.dockerignore = .dockerignore
+		build.cake = build.cake
+		CHANGELOG.md = CHANGELOG.md
+		semver.json = semver.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorMerge", "src\BlazorMerge\BlazorMerge.csproj", "{547043C0-1917-4C37-9624-97217B9B3D69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorMerge.UnitTests", "test\BlazorMerge.UnitTests\BlazorMerge.UnitTests.csproj", "{0371A4A2-33E8-405C-BD18-CA2B858189B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{547043C0-1917-4C37-9624-97217B9B3D69} = {EEC2813C-EAE5-4149-A84C-2D94341AF113}
+		{0371A4A2-33E8-405C-BD18-CA2B858189B7} = {E2806C90-5768-465A-82DF-2FF4741C48FB}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{547043C0-1917-4C37-9624-97217B9B3D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{547043C0-1917-4C37-9624-97217B9B3D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{547043C0-1917-4C37-9624-97217B9B3D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{547043C0-1917-4C37-9624-97217B9B3D69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0371A4A2-33E8-405C-BD18-CA2B858189B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0371A4A2-33E8-405C-BD18-CA2B858189B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0371A4A2-33E8-405C-BD18-CA2B858189B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0371A4A2-33E8-405C-BD18-CA2B858189B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
