@@ -1,14 +1,14 @@
-﻿using BlazorMerge.Files;
-using Microsoft.Extensions.Configuration;
+﻿using System.Text.RegularExpressions;
+using BlazorMerge.Files;
 
 namespace BlazorMerge.Feature.Merge;
 
-public class MergeService
+public partial class MergeService
 {
     private readonly IFileManager _fileManager;
     private readonly IMerger _merger;
 
-    public MergeService(IConfiguration config, IFileManager fileManager, IMerger merger)
+    public MergeService(IFileManager fileManager, IMerger merger)
     {
         _fileManager = fileManager;
         _merger = merger;
@@ -23,19 +23,20 @@ public class MergeService
         var readEnvironmentSetting = _fileManager.ReadFile(ConstructPath(options.Path, environmentFileName));
         WriteNewSettingsFile(readAppSetting, readEnvironmentSetting, mainFilePath);
         DeleteSettingsFiles(options);
+        WriteNewSettingsFile("{}", "{}", ConstructPath(options.Path, "appsettings.Production.json"));
 
         return 0;
     }
 
     private static string ConstructPath(string path, string fileName)
     {
-        var computedPath = (path.Trim().EndsWith("\\") || path.Trim().EndsWith("/")) ? path : $"{path}\\";
+        var computedPath = path.Trim().EndsWith('\\') || path.Trim().EndsWith('/') ? path : $"{path}\\";
         return $"{computedPath}{fileName}";
     }
 
     private void DeleteSettingsFiles(MergeOptions options)
     {
-        var files = _fileManager.ListSettingsFiles(options.Path, fileName => OnlySettingsFiles(fileName, options));
+        var files = _fileManager.ListSettingsFiles(options.Path, OnlySettingsFiles);
         var settingsFiles = ParseSettingsFiles(files);
         var jsonFilesToDelete = settingsFiles
             .Where(x => x is {Type: SettingsFileType.Environment, Extension: SettingsFileExtension.Json}).ToList();
@@ -47,16 +48,10 @@ public class MergeService
         DeleteFiles(gzipFilesToDelete, options);
     }
 
-    private bool OnlySettingsFiles(string fileName, MergeOptions options)
+    private static bool OnlySettingsFiles(string fileName)
     {
-        var mainFileName = Constants.MainFileName;
-        var environmentFileName = ReplacePath(options);
-        return fileName.EndsWith(mainFileName) ||
-               fileName.EndsWith($"{mainFileName}.br") ||
-               fileName.EndsWith($"{mainFileName}.gz") ||
-               fileName.EndsWith(environmentFileName) ||
-               fileName.EndsWith($"{environmentFileName}.br") ||
-               fileName.EndsWith($"{environmentFileName}.gz");
+        var match = IsAppSettingsFile().Match(fileName);
+        return match.Success;
     }
 
     private static IList<SettingsFile> ParseSettingsFiles(IEnumerable<string> files)
@@ -69,6 +64,7 @@ public class MergeService
             settingsFile.FileName = file;
             settingsFile.Type = split[1] switch
             {
+                "Dev" => SettingsFileType.Environment,
                 "Development" => SettingsFileType.Environment,
                 "Production" => SettingsFileType.Environment,
                 "Staging" => SettingsFileType.Environment,
@@ -79,7 +75,7 @@ public class MergeService
                 "json" => SettingsFileExtension.Json,
                 "br" => SettingsFileExtension.Brotli,
                 "gz" => SettingsFileExtension.Gzip,
-                _ => throw new ArgumentOutOfRangeException(nameof(file), "File extension not supported")
+                _ => throw new ArgumentOutOfRangeException(file, "File extension not supported")
             };
             settingsFiles.Add(settingsFile);
         }
@@ -108,4 +104,7 @@ public class MergeService
         
         return environmentFileNameFormat.Replace("{environment}", environment);
     }
+
+    [GeneratedRegex(@"appsettings(\.\w+)?\.(json|br|gz)$")]
+    private static partial Regex IsAppSettingsFile();
 }
