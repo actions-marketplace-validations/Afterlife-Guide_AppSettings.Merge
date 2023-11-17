@@ -1,7 +1,6 @@
 ﻿using BlazorMerge;
 using BlazorMerge.Feature.Merge;
 using BlazorMerge.Files;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

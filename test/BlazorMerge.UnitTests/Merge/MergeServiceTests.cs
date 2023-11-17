@@ -1,37 +1,44 @@
 ﻿using BlazorMerge.Feature.Merge;
 using BlazorMerge.Files;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using NSubstitute;
-using NSubstitute.ReceivedExtensions;
+using NSubstitute.Extensions;
 
 namespace BlazorMerge.UnitTests.Merge;
 
 public class MergeServiceTests
 {
     [Theory]
-    [InlineData("appsettings.json", "appsettings.{environment}.json", "appsettings.Development.json")]
-    public void When_LoadingData_Then_DataShouldBePassedToMergerCorrectly(string primaryFileName, string secondaryFileFormat, string secondaryFileFinalFormat)
+    [InlineData("appsettings.json", "appsettings.{environment}.json", "Development")]
+    [InlineData("appsettings.json", "appsettings.{environment}.json", "Staging")]
+    public void When_LoadingData_Then_DataShouldBePassedToMergerCorrectly(string primaryFileName, string secondaryFileFormat, string environment)
     {
-        // Arrange
+        // arrange
         var options = new MergeOptions
         {
-            Environment = "Development",
+            Environment = environment,
             Path = @"Z:\my-project\wwwroot\"
         };
         
         const string readValue = "{\"key\": \"value\"}";
         const string mergeValue = "{\"key\": \"other value\"}";
-        
-        IList<string> settingsFiles = new List<string>
+
+        var otherFiles = new List<string>
+        {
+            "appsettings.Dev.json",
+            "appsettings.Production.json"
+        };
+        var settingsFiles = new List<string>
         {
             primaryFileName,
             $"{primaryFileName}.br",
             $"{primaryFileName}.gz",
-            secondaryFileFinalFormat,
-            $"{secondaryFileFinalFormat}.br",
-            $"{secondaryFileFinalFormat}.gz"
+            $"appsettings.{environment}.json",
+            $"appsettings.{environment}.br",
+            $"appsettings.{environment}.gz"
         };
+        
+        settingsFiles.AddRange(otherFiles);
         var mockConfig = Substitute.For<IConfiguration>();
         mockConfig["AppSettings:MainFileName"].Returns(primaryFileName);
         mockConfig["AppSettings:EnvironmentFileName"].Returns(secondaryFileFormat);
@@ -44,24 +51,24 @@ public class MergeServiceTests
         
         var mockMerger = Substitute.For<IMerger>();
         mockMerger.Merge(Arg.Any<string>(), Arg.Any<string>()).Returns(mergeValue);
+        mockMerger.Configure().Merge("{}", "{}").Returns("{}");
         
-        var mergeService = new MergeService(
-            mockConfig,
-            mockFileManager,
+        var mergeService = new MergeService(mockFileManager,
             mockMerger
             );
         
-        // Act
+        // act
         var result = mergeService.MergeEnvironment(options);
         
-        // Assert
+        // assert
         result.Should().Be(0);
         mockFileManager.Received(2).ReadFile(Arg.Any<string>());
         mockFileManager.Received(1).ReadFile($"{options.Path}{primaryFileName}");
-        mockFileManager.Received(1).ReadFile($"{options.Path}{secondaryFileFinalFormat}");
+        mockFileManager.Received(1).ReadFile($"{options.Path}appsettings.{environment}.json");
         mockFileManager.Received(1).WriteFile($"{options.Path}{primaryFileName}", mergeValue);
+        mockFileManager.Received(1).WriteFile($"{options.Path}appsettings.Production.json", "{}");
         
-        var environmentJsonFiles = settingsFiles.Where(s => s == secondaryFileFinalFormat).ToList();
+        var environmentJsonFiles = settingsFiles.Where(s => s.EndsWith(".json") && !s.EndsWith("appsettings.json")).ToList();
         var allBrotliFiles = settingsFiles.Where(s => s.EndsWith(".br")).ToList();
         var allGzipFiles = settingsFiles.Where(s => s.EndsWith(".gz")).ToList();
         var filesToDeleteCount = environmentJsonFiles.Count + allBrotliFiles.Count + allGzipFiles.Count;
@@ -72,7 +79,7 @@ public class MergeServiceTests
         VerifyDeletion(mockFileManager, options, allBrotliFiles);
         VerifyDeletion(mockFileManager, options, allGzipFiles);
         
-        mockMerger.Received(1).Merge(Arg.Any<string>(), Arg.Any<string>());
+        mockMerger.Received(2).Merge(Arg.Any<string>(), Arg.Any<string>());
     }
 
     private static void VerifyDeletion(IFileManager mockFileManager, MergeOptions options, IEnumerable<string> files)
