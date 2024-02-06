@@ -26,17 +26,17 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Restore
-      uses: cake-build/cake-action@v1
+      uses: cake-build/cake-action@v2
       with:
         target: Restore
     - name: Build
-      uses: cake-build/cake-action@v1
+      uses: cake-build/cake-action@v2
       with:
         target: Build
         arguments: |
           versionNumber: ${{inputs.version}}
     - name: Run tests
-      uses: cake-build/cake-action@v1
+      uses: cake-build/cake-action@v2
       with:
         target: Test
     - name: Publish Unit Test Results
