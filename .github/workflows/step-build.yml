@@ -20,11 +20,11 @@ jobs:
       run: |
         echo "Branch: $CHECKOUT_REF"
     - name: Checkout
-      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         ref: ${{ inputs.checkout-ref }}
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
       with:
         dotnet-version: 10.0.x
     - name: Restore
@@ -43,6 +43,6 @@ jobs:
         target: Test
     - name: Publish Unit Test Results
       if: ${{ github.actor != 'dependabot[bot]' }}
-      uses: EnricoMi/publish-unit-test-result-action/linux@c950f6fb443cb5af20a377fd0dfaa78838901040
+      uses: EnricoMi/publish-unit-test-result-action/linux@d0a4676d0e0b938bc201470d88276b7c74c712b3
       with:
         files: "**/TestResults/*.xml"
