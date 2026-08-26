@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Removed direct user-controlled workflow-dispatch values from GitHub Actions parameters in the hotfix and release workflows; the generated gitStream workflow requires the equivalent upstream generator configuration change (#347).
+
 ## [0.4.9.30] - 2026-08-12
 
 ## [0.4.8.29] - 2026-07-27

@@ -21,8 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ env.HEAD_REF }}
       - name: Increment Version
         id: increment_version
         run: |
