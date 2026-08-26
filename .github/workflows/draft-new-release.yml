@@ -36,17 +36,23 @@ jobs:
         
       - name: Update Version Number
         uses: Afterlife-Guide/SemVer.Action@64735fc76aaefe739484e00949686ba8a1ded868
+        env:
+          MAJOR_VERSION: ${{ github.event.inputs.major_version }}
+          MINOR_VERSION: ${{ github.event.inputs.minor_version }}
+          PATCH_VERSION: ${{ github.event.inputs.patch_version }}
         with:
           path: semver.json
-          major-version: ${{ github.event.inputs.major_version }}
-          minor-version: ${{ github.event.inputs.minor_version }}
-          patch-version: ${{ github.event.inputs.patch_version }}
+          major-version: ${{ env.MAJOR_VERSION }}
+          minor-version: ${{ env.MINOR_VERSION }}
+          patch-version: ${{ env.PATCH_VERSION }}
           build-version: ${{ github.run_number }}
 
       - name: Update changelog
         uses: baynezy/ChangeLogger.Action@6e3ad430f08e13698bb01027a13ba4349b0143cc
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.major_version }}.${{ github.event.inputs.minor_version }}.${{ github.event.inputs.patch_version }}.${{ github.run_number }}
         with:
-          tag: ${{ github.event.inputs.major_version }}.${{ github.event.inputs.minor_version }}.${{ github.event.inputs.patch_version }}.${{ github.run_number }}
+          tag: ${{ env.RELEASE_TAG }}
 
       - name: Update docker image tag version in action.yml
         env:
