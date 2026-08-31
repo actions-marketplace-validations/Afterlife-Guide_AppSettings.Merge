@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Removed direct user-controlled workflow-dispatch values from GitHub Actions parameters in the hotfix and release workflows; the generated gitStream workflow requires the equivalent upstream generator configuration change (#347).
+
+## [0.4.9.30] - 2026-08-12
+
+## [0.4.8.29] - 2026-07-27
+
+## [0.4.7.28] - 2026-06-10
+
 ## [0.4.6.27] - 2026-04-22
 
 ## [0.4.5.26] - 2026-04-15
@@ -115,7 +125,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.3.4] - 2023-11-17
 
-[unreleased]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.6.27...HEAD
+[unreleased]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.9.30...HEAD
+[0.4.9.30]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.8.29...0.4.9.30
+[0.4.8.29]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.7.28...0.4.8.29
+[0.4.7.28]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.6.27...0.4.7.28
 [0.4.6.27]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.5.26...0.4.6.27
 [0.4.5.26]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.4.25...0.4.5.26
 [0.4.4.25]: https://github.com/Afterlife-Guide/AppSettings.Merge/compare/0.4.3.24...0.4.4.25
