@@ -15,11 +15,11 @@
       <PackageReference Include="NSubstitute" Version="6.2.0" />
       <PackageReference Include="StubLogger" Version="3.0.1.9" />
       <PackageReference Include="Verify.XunitV3" Version="32.0.0" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+      <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="xunit.v3" Version="4.0.0" />
+      <PackageReference Include="xunit.v3" Version="4.0.2" />
     </ItemGroup>
 
     <ItemGroup>
